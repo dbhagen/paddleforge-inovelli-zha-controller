@@ -56,6 +56,7 @@ from .const import (
     CONF_MAX_MINUTES,
     CONF_PAIR_PREFIX,
     CONF_PALETTE,
+    CONF_PULSE_HUE,
     CONF_WINDOW_SECONDS,
     DEFAULT_CMD_ARM,
     DEFAULT_CMD_COLOR,
@@ -75,6 +76,7 @@ from .const import (
     DEFAULT_LED_COLOR_HUE,
     DEFAULT_LED_REFRESH_INTERVAL,
     DEFAULT_MAX_MINUTES,
+    DEFAULT_PULSE_HUE,
     DEFAULT_TIMER_OPTIONS,
     DOMAIN,
     ENTRY_TYPE_CONTROLLER,
@@ -289,6 +291,10 @@ class TimerOptionsFlow(OptionsFlow):
                 vol.Required(
                     CONF_LED_COLOR_HUE,
                     default=current.get(CONF_LED_COLOR_HUE, DEFAULT_LED_COLOR_HUE),
+                ): _hue_selector(),
+                vol.Required(
+                    CONF_PULSE_HUE,
+                    default=current.get(CONF_PULSE_HUE, DEFAULT_PULSE_HUE),
                 ): _hue_selector(),
                 vol.Required(
                     CONF_FLASH_THRESHOLD_SECONDS,
