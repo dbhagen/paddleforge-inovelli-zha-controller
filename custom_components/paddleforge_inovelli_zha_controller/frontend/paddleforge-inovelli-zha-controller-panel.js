@@ -1,14 +1,14 @@
 /**
- * Inovelli Scene Pairing — sidebar panel + Lovelace card (no build step).
+ * Paddleforge Inovelli ZHA Controller — sidebar panel + Lovelace card (no build step).
  *
- * Reads the group snapshot from `sensor.inovelli_scene_pairing_groups` (attribute
+ * Reads the group snapshot from `sensor.paddleforge_inovelli_zha_controller_groups` (attribute
  * `groups`, kept live by the integration) and drives the create/add/remove/recolor/
  * delete services. Physical scene-button changes flow back through the same sensor,
  * so the UI and the switches stay in sync.
  */
 
-const DOMAIN = "inovelli_scene_pairing";
-const SENSOR_ID = "sensor.inovelli_scene_pairing_groups";
+const DOMAIN = "paddleforge_inovelli_zha_controller";
+const SENSOR_ID = "sensor.paddleforge_inovelli_zha_controller_groups";
 
 const hueToHex = (hue) => {
   const h = ((Number(hue) % 256) / 255) * 6;
@@ -143,7 +143,7 @@ class InovelliPairingBase extends HTMLElement {
     try {
       await this._hass.callService(DOMAIN, service, data);
     } catch (err) {
-      alert(`Inovelli Scene Pairing: ${err.message || err}`);
+      alert(`Paddleforge Inovelli ZHA Controller: ${err.message || err}`);
     }
   }
 
@@ -215,9 +215,9 @@ class InovelliPairingBase extends HTMLElement {
       : '<p class="muted">No Inovelli switches found.</p>';
 
     const topbar = this._isPanel
-      ? `<div class="topbar"><button class="menu" data-act="menu" title="Open menu" aria-label="Open menu">☰</button><div class="topbar-title">Inovelli Scene Pairing</div></div>`
+      ? `<div class="topbar"><button class="menu" data-act="menu" title="Open menu" aria-label="Open menu">☰</button><div class="topbar-title">Paddleforge Inovelli ZHA Controller</div></div>`
       : "";
-    const heading = this._isPanel ? "" : "<h1>Inovelli Scene Pairing</h1>";
+    const heading = this._isPanel ? "" : "<h1>Paddleforge Inovelli ZHA Controller</h1>";
 
     this.shadowRoot.innerHTML = `
       <style>${STYLE}</style>
@@ -337,18 +337,18 @@ class InovelliScenePairingCard extends InovelliPairingBase {
   }
 }
 
-if (!customElements.get("inovelli-scene-pairing-panel")) {
-  customElements.define("inovelli-scene-pairing-panel", InovelliScenePairingPanel);
+if (!customElements.get("paddleforge-inovelli-zha-controller-panel")) {
+  customElements.define("paddleforge-inovelli-zha-controller-panel", InovelliScenePairingPanel);
 }
-if (!customElements.get("inovelli-scene-pairing-card")) {
-  customElements.define("inovelli-scene-pairing-card", InovelliScenePairingCard);
+if (!customElements.get("paddleforge-inovelli-zha-controller-card")) {
+  customElements.define("paddleforge-inovelli-zha-controller-card", InovelliScenePairingCard);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === "inovelli-scene-pairing-card")) {
+if (!window.customCards.some((c) => c.type === "paddleforge-inovelli-zha-controller-card")) {
   window.customCards.push({
-    type: "inovelli-scene-pairing-card",
-    name: "Inovelli Scene Pairing",
+    type: "paddleforge-inovelli-zha-controller-card",
+    name: "Paddleforge Inovelli ZHA Controller",
     description: "Manage Inovelli Blue pairing groups (create, add, recolor, remove).",
   });
 }

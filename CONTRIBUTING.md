@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve **Inovelli Scene Pairing**!
+Thanks for helping improve **Paddleforge Inovelli ZHA Controller**!
 
 ## Development setup
 
@@ -13,7 +13,7 @@ Thanks for helping improve **Inovelli Scene Pairing**!
    ```
 3. Symlink (or copy) the integration into a dev Home Assistant config to test live:
    ```bash
-   ln -s "$(pwd)/custom_components/inovelli_scene_pairing" /path/to/ha/config/custom_components/
+   ln -s "$(pwd)/custom_components/paddleforge_inovelli_zha_controller" /path/to/ha/config/custom_components/
    ```
    Restart HA and add the integration.
 4. Lint/format before committing:
@@ -64,7 +64,7 @@ feat!: rename the pairing option keys
 ## How releases work
 
 - Merges to `main` are analyzed by **release-please**, which opens/updates a "release PR" that
-  bumps the version in `custom_components/inovelli_scene_pairing/manifest.json` and updates
+  bumps the version in `custom_components/paddleforge_inovelli_zha_controller/manifest.json` and updates
   `CHANGELOG.md`.
 - Merging that release PR tags a new version and publishes a GitHub Release; HACS then offers
   it as an update.

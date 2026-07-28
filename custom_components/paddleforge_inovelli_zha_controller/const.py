@@ -1,11 +1,19 @@
-"""Constants for the Inovelli Scene Pairing integration."""
+"""Constants for the Paddleforge Inovelli ZHA Controller integration."""
 
 from __future__ import annotations
 
-DOMAIN = "inovelli_scene_pairing"
+DOMAIN = "paddleforge_inovelli_zha_controller"
 
 # Home Assistant event fired by ZHA for device scene/button actions.
 ZHA_EVENT = "zha_event"
+
+# --- Config-entry kind ----------------------------------------------------------
+# One integration, two entry shapes: a single global "controller" entry owns the
+# grouping/pairing system (groups sensor, panel, services); each "timer" entry owns
+# one physical switch's ventilation timer. Stored in entry.data[CONF_ENTRY_TYPE].
+CONF_ENTRY_TYPE = "entry_type"
+ENTRY_TYPE_CONTROLLER = "controller"
+ENTRY_TYPE_TIMER = "timer"
 
 # --- Actions and the (configurable) gesture -> action map -----------------------
 # On Inovelli Blue over ZHA: button_3 = config button, button_1/button_2 = down/up
@@ -80,12 +88,14 @@ GESTURE_COMMANDS = [
     ("button_2_press", "Up paddle — single tap"),
     ("button_2_double", "Up paddle — double tap"),
     ("button_2_hold", "Up paddle — hold"),
+    ("button_2_release", "Up paddle — release"),
     ("button_1_press", "Down paddle — single tap"),
     ("button_1_double", "Down paddle — double tap"),
     ("button_1_hold", "Down paddle — hold"),
+    ("button_1_release", "Down paddle — release"),
 ]
 
-DEFAULT_OPTIONS = {
+DEFAULT_CONTROLLER_OPTIONS = {
     CONF_WINDOW_SECONDS: WINDOW_SECONDS_DEFAULT,
     CONF_PALETTE: PALETTE_DEFAULT,
     CONF_PAIR_PREFIX: GROUP_NAME_PREFIX_DEFAULT,
@@ -112,9 +122,95 @@ SERVICE_DELETE_GROUP = "delete_group"
 SERVICE_ENTER_PAIRING = "enter_pairing_mode"
 
 # Frontend panel/card
-PANEL_URL_PATH = "inovelli-pairing"
-PANEL_TITLE = "Inovelli Pairing"
+PANEL_URL_PATH = "paddleforge-controller"
+PANEL_TITLE = "Paddleforge Controller"
 PANEL_ICON = "mdi:led-strip-variant"
-PANEL_NAME = "inovelli-scene-pairing-panel"
-FRONTEND_SCRIPT_URL = f"/{DOMAIN}/inovelli-scene-pairing-panel.js"
+PANEL_NAME = "paddleforge-inovelli-zha-controller-panel"
+FRONTEND_SCRIPT_URL = f"/{DOMAIN}/paddleforge-inovelli-zha-controller-panel.js"
 WS_LIST_GROUPS = f"{DOMAIN}/list_groups"
+
+
+# ================================================================================
+# Ventilation-timer feature (per-device "timer" entries). Folded in from the former
+# inovelli-fan-timer integration. Gestures here are the PADDLES; the grouping feature
+# above uses the CONFIG BUTTON, so both can run on one switch without colliding.
+# ================================================================================
+
+# Per-segment LED painting (the timer fills the bar from the bottom).
+LED_EFFECT_INDIVIDUAL_CMD = 3  # individual_led_effect (needs led_number 0-6)
+LED_SEGMENTS = 7  # the LED bar has 7 individually-addressable segments
+
+# LED effect ids. 0 (clear) + 2 (fast_blink) confirmed on VZM31; SOLID (1) a best
+# guess — verify on hardware. (LED_FX_CLEAR / LED_FX_FAST_BLINK defined above.)
+LED_FX_SOLID = 1
+LED_FX_SLOW_BLINK = 3
+LED_FX_PULSE = 4  # breathing — reserved for the (later) humidity auto-mode
+
+# led_duration LED-effect encoding: 1-60 = s, 61-120 = min, 121-254 = hr, 255 = indefinite.
+LED_DURATION_INDEFINITE = 255
+
+LED_HUE_TIMER_DEFAULT = 170  # blue (the house "fan" color)
+
+# --- Timer modes ----------------------------------------------------------------
+MODE_IDLE = "idle"
+MODE_RUNNING = "running"
+MODE_SETTING = "setting"
+MODE_EXPIRING = "expiring"
+
+# --- Timer gesture commands (paddle) --------------------------------------------
+CONF_CMD_START = "cmd_start"
+CONF_CMD_UP_HOLD = "cmd_up_hold"
+CONF_CMD_UP_RELEASE = "cmd_up_release"
+CONF_CMD_DOWN_HOLD = "cmd_down_hold"
+CONF_CMD_DOWN_RELEASE = "cmd_down_release"
+
+DEFAULT_CMD_START = "button_2_double"
+DEFAULT_CMD_UP_HOLD = "button_2_hold"
+DEFAULT_CMD_UP_RELEASE = "button_2_release"
+DEFAULT_CMD_DOWN_HOLD = "button_1_hold"
+DEFAULT_CMD_DOWN_RELEASE = "button_1_release"
+
+# --- Timer config-entry data ----------------------------------------------------
+CONF_DEVICE_ID = "device_id"
+
+# --- Timer options + defaults ---------------------------------------------------
+CONF_MAX_MINUTES = "max_minutes"
+CONF_DOUBLE_TAP_MINUTES = "double_tap_minutes"
+CONF_HOLD_RAMP_SECONDS = "hold_ramp_seconds_full"
+CONF_LED_REFRESH_INTERVAL = "led_refresh_interval"
+CONF_LED_COLOR_HUE = "led_color_hue"
+CONF_FLASH_THRESHOLD_SECONDS = "flash_threshold_seconds"
+
+DEFAULT_MAX_MINUTES = 30
+DEFAULT_HOLD_RAMP_SECONDS = 6
+DEFAULT_LED_REFRESH_INTERVAL = 10
+DEFAULT_LED_COLOR_HUE = LED_HUE_TIMER_DEFAULT
+DEFAULT_FLASH_THRESHOLD_SECONDS = 60
+
+# Hidden tuning constants (not exposed as options).
+RAMP_TICK_INTERVAL = 0.25  # seconds between hold-ramp recomputes
+GESTURE_DEBOUNCE_SECONDS = 0.3  # ignore a repeated identical gesture within this window
+LOAD_SUPPRESS_SECONDS = 2.0  # ignore self-inflicted relay state changes within this window
+
+# --- Humidity seam (reserved for the follow-up; not rendered yet) ----------------
+CONF_HUMIDITY_ENTITY = "humidity_entity"
+CONF_HUMIDITY_THRESHOLD = "humidity_threshold"
+CONF_AUTO_MODE = "auto_mode"
+
+DEFAULT_TIMER_OPTIONS = {
+    CONF_MAX_MINUTES: DEFAULT_MAX_MINUTES,
+    CONF_DOUBLE_TAP_MINUTES: DEFAULT_MAX_MINUTES,
+    CONF_HOLD_RAMP_SECONDS: DEFAULT_HOLD_RAMP_SECONDS,
+    CONF_LED_REFRESH_INTERVAL: DEFAULT_LED_REFRESH_INTERVAL,
+    CONF_LED_COLOR_HUE: DEFAULT_LED_COLOR_HUE,
+    CONF_FLASH_THRESHOLD_SECONDS: DEFAULT_FLASH_THRESHOLD_SECONDS,
+    CONF_CMD_START: DEFAULT_CMD_START,
+    CONF_CMD_UP_HOLD: DEFAULT_CMD_UP_HOLD,
+    CONF_CMD_UP_RELEASE: DEFAULT_CMD_UP_RELEASE,
+    CONF_CMD_DOWN_HOLD: DEFAULT_CMD_DOWN_HOLD,
+    CONF_CMD_DOWN_RELEASE: DEFAULT_CMD_DOWN_RELEASE,
+}
+
+SERVICE_START_TIMER = "start_timer"
+SERVICE_CANCEL_TIMER = "cancel_timer"
+SERVICE_SET_MINUTES = "set_minutes"

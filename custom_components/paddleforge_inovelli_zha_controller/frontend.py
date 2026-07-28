@@ -32,7 +32,7 @@ _STATIC_REGISTERED = f"{DOMAIN}_static_registered"
 _MODULE_URL = f"{DOMAIN}_module_url"
 
 _URL_ROOT = f"/{DOMAIN}"
-_SCRIPT_FILE = "inovelli-scene-pairing-panel.js"
+_SCRIPT_FILE = "paddleforge-inovelli-zha-controller-panel.js"
 
 
 def _add_module_url(hass: HomeAssistant, url: str) -> None:

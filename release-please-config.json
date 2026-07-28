@@ -17,12 +17,12 @@
   ],
   "packages": {
     ".": {
-      "package-name": "inovelli-scene-pairing",
+      "package-name": "paddleforge-inovelli-zha-controller",
       "changelog-path": "CHANGELOG.md",
       "extra-files": [
         {
           "type": "json",
-          "path": "custom_components/inovelli_scene_pairing/manifest.json",
+          "path": "custom_components/paddleforge_inovelli_zha_controller/manifest.json",
           "jsonpath": "$.version"
         }
       ]

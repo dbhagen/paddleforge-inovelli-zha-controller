@@ -1,16 +1,23 @@
-# Inovelli Scene Pairing
+# Paddleforge Inovelli ZHA Controller
 
-[![License: MIT](https://img.shields.io/github/license/dbhagen/inovelli-scene-pairing?color=blue)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/dbhagen/inovelli-scene-pairing?display_name=tag&sort=semver)](https://github.com/dbhagen/inovelli-scene-pairing/releases)
+[![License: MIT](https://img.shields.io/github/license/dbhagen/paddleforge-inovelli-zha-controller?color=blue)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/dbhagen/paddleforge-inovelli-zha-controller?display_name=tag&sort=semver)](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/releases)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![Validate](https://github.com/dbhagen/inovelli-scene-pairing/actions/workflows/validate.yml/badge.svg)](https://github.com/dbhagen/inovelli-scene-pairing/actions/workflows/validate.yml)
+[![Validate](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/actions/workflows/validate.yml/badge.svg)](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/actions/workflows/validate.yml)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=dbhagen&repository=inovelli-scene-pairing&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=dbhagen&repository=paddleforge-inovelli-zha-controller&category=integration)
 
-> Pair Inovelli Blue switches into **bidirectionally-mirrored Zigbee groups** and set
-> **per-group LED bar colors** — entirely from the switch's scene button, over **ZHA**.
-> No hand-written automations, no hub round-trip: grouped switches mirror each other at
-> the Zigbee level.
+> Drive Inovelli Blue switches from their own gestures, over **ZHA** — no hand-written
+> automations, no hub round-trip. Two features share one integration:
+>
+> - **Grouping** — pair switches into **bidirectionally-mirrored Zigbee groups** with
+>   **per-group LED bar colors**, entirely from the **config button**. Grouped switches
+>   mirror each other at the Zigbee level, even if Home Assistant is offline.
+> - **Ventilation timers** — turn any switch into a **paddle-driven countdown timer**:
+>   double-tap to start, hold up/down to change the remaining time, watch the LED bar
+>   count down, load off at zero.
+>
+> The two use different buttons (config button vs paddles), so a switch can run both.
 
 ## Why
 
@@ -24,6 +31,7 @@ Assistant is offline.
 ## Supported devices
 
 - **Inovelli Blue 2-in-1 Dimmer — VZM31-SN**
+- **Inovelli Blue On/Off Switch — VZM30-SN** (great as a ventilation-timer host)
 - **Inovelli Blue Fan Switch — VZM35-SN**
 - Requires the **ZHA** (Zigbee Home Automation) integration. **Zigbee2MQTT is not supported.**
 
@@ -52,13 +60,35 @@ The pairing gesture doubles as a per-switch LED setup: **hold** a switch to arm 
 **single-tap** to cycle its LED bar color. If you never join it to a group, the color you
 land on **sticks** — so `hold → tap → walk away` sets any switch's standalone color.
 
+## Ventilation timers
+
+Add a **ventilation timer** to a single switch (**Add Integration → Paddleforge Inovelli ZHA
+Controller → Ventilation timer for one switch**, one entry per switch). The timer is driven by
+the **paddles**, so it coexists with grouping on the config button:
+
+| Gesture | Action |
+| --- | --- |
+| **Double-tap up** (paddle) | Start the timer (default: the maximum) — load on |
+| **Hold up** (paddle) | Raise the remaining time; the LED bar fills from the bottom |
+| **Hold down** (paddle) | Lower the remaining time |
+| (at zero) | Load off, LED clears |
+
+While running, the LED bar shows the time remaining and **fast-blinks** near expiry. Turning the
+load off manually cancels the timer. Each gesture is remappable, and everything is also available
+as services (`start_timer`, `cancel_timer`, `set_minutes`) plus `switch`/`number`/`sensor`
+entities on the device — so automations (e.g. a humidity trigger) can start a timed run and get
+the same LED countdown.
+
+Timer options: maximum minutes, double-tap start minutes, hold-ramp speed, LED refresh interval
+and color, near-expiry flash threshold, and the five paddle-gesture mappings.
+
 ## Dashboard
 
-Enable **Management dashboard** in the options to add an **Inovelli Pairing** sidebar panel
+Enable **Management dashboard** in the options to add an **Paddleforge Controller** sidebar panel
 (and a matching Lovelace card) that mirrors every physical action: create groups from a
 device picker, add/remove switches, recolor a group with a live-preview hue slider, and
-delete groups — all kept in sync with the switches. A `sensor.inovelli_scene_pairing_groups`
-entity exposes the current groups, and services (`inovelli_scene_pairing.create_group`,
+delete groups — all kept in sync with the switches. A `sensor.paddleforge_inovelli_zha_controller_groups`
+entity exposes the current groups, and services (`paddleforge_inovelli_zha_controller.create_group`,
 `add_member`, `remove_member`, `set_color`, `delete_group`, `enter_pairing_mode`) back the UI
 for use in your own automations.
 
@@ -71,14 +101,16 @@ for use in your own automations.
 ## Installation
 
 1. In HACS → three-dot menu → **Custom repositories**.
-2. Add `https://github.com/dbhagen/inovelli-scene-pairing`, category **Integration**
+2. Add `https://github.com/dbhagen/paddleforge-inovelli-zha-controller`, category **Integration**
    (or click the **My Home Assistant** badge above).
-3. Install **Inovelli Scene Pairing**, then **restart Home Assistant**.
-4. **Settings → Devices & Services → Add Integration →** search "Inovelli Scene Pairing".
+3. Install **Paddleforge Inovelli ZHA Controller**, then **restart Home Assistant**.
+4. **Settings → Devices & Services → Add Integration →** search "Paddleforge Inovelli ZHA
+   Controller". A menu offers the **grouping controller** (add once) and a **ventilation timer**
+   (add one per switch).
 
 ## Options
 
-**Settings → Devices & Services → Inovelli Scene Pairing → Configure:**
+**Settings → Devices & Services → Paddleforge Inovelli ZHA Controller → Configure:**
 
 - **Pairing window (seconds)** — how long a switch stays in pairing mode after a hold (default 20).
 - **LED color palette** — comma-separated hues (0–255) cycled by a single tap.
@@ -118,7 +150,7 @@ for use in your own automations.
   ```yaml
   logger:
     logs:
-      custom_components.inovelli_scene_pairing: debug
+      custom_components.paddleforge_inovelli_zha_controller: debug
   ```
 - This integration relies on ZHA internal APIs. If a Home Assistant upgrade breaks it, please
   open an issue with your HA version and a debug log.
