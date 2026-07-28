@@ -3,17 +3,29 @@
     "step": {
       "user": {
         "title": "Paddleforge Inovelli ZHA Controller",
-        "description": "Pair Inovelli Blue switches into ZHA groups from their scene buttons. Requires the ZHA integration."
+        "description": "Choose what to add.",
+        "menu_options": {
+          "controller": "Grouping controller (add once)",
+          "device_timer": "Ventilation timer for one switch"
+        }
+      },
+      "device_timer": {
+        "title": "Add a ventilation timer",
+        "description": "Pick the Inovelli switch to run as a paddle-driven ventilation timer.",
+        "data": {
+          "device_id": "Inovelli switch"
+        }
       }
     },
     "abort": {
-      "single_instance_allowed": "Only a single configuration of Paddleforge Inovelli ZHA Controller is allowed."
+      "single_instance_allowed": "Only a single grouping controller is allowed.",
+      "already_configured": "This is already configured."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Paddleforge Inovelli ZHA Controller options",
+        "title": "Options",
         "data": {
           "window_seconds": "Pairing window (seconds)",
           "palette": "LED color palette (comma-separated hues 0-255)",
@@ -26,7 +38,18 @@
           "default_fan_hue": "Default fan idle color (hue 0-255)",
           "enable_hardware": "Enable physical scene-button pairing",
           "enable_dashboard": "Enable management dashboard",
-          "hide_group_entities": "Hide ZHA group entities"
+          "hide_group_entities": "Hide ZHA group entities",
+          "max_minutes": "Maximum timer minutes",
+          "double_tap_minutes": "Double-tap start minutes",
+          "hold_ramp_seconds_full": "Hold-ramp seconds (empty to full)",
+          "led_refresh_interval": "LED refresh interval (seconds)",
+          "led_color_hue": "Timer LED color (hue 0-255)",
+          "flash_threshold_seconds": "Near-expiry flash threshold (seconds)",
+          "cmd_start": "Start-timer gesture",
+          "cmd_up_hold": "Raise-time hold gesture",
+          "cmd_up_release": "Raise-time release gesture",
+          "cmd_down_hold": "Lower-time hold gesture",
+          "cmd_down_release": "Lower-time release gesture"
         },
         "data_description": {
           "window_seconds": "How long a switch stays in pairing mode after you hold its config button.",
@@ -39,8 +62,19 @@
           "default_light_hue": "LED bar hue a light dimmer shows when it is not in a group (default 21, orange).",
           "default_fan_hue": "LED bar hue a fan switch shows when it is not in a group (default 170, blue).",
           "enable_hardware": "React to the physical scene buttons (hold to pair/arm, tap to set color, etc.). Turn off for a dashboard-only setup.",
-          "enable_dashboard": "Adds an \"Paddleforge Controller\" sidebar panel + Lovelace card to create, add, recolor, and remove groups. Hard-refresh the browser after toggling.",
-          "hide_group_entities": "ZHA auto-creates a light + switch entity for every Zigbee group; they duplicate the bound switches and leak to HomeKit/Google. On (default) disables them in the entity registry; off re-enables the ones this integration disabled."
+          "enable_dashboard": "Adds a \"Paddleforge Controller\" sidebar panel + Lovelace card to create, add, recolor, and remove groups. Hard-refresh the browser after toggling.",
+          "hide_group_entities": "ZHA auto-creates a light + switch entity for every Zigbee group; they duplicate the bound switches and leak to HomeKit/Google. On (default) disables them in the entity registry; off re-enables the ones this integration disabled.",
+          "max_minutes": "The most time the timer can be set to (paddle-hold and double-tap both cap here).",
+          "double_tap_minutes": "Time a double-tap start loads (defaults to the maximum).",
+          "hold_ramp_seconds_full": "Seconds of paddle-hold to sweep from empty to the maximum.",
+          "led_refresh_interval": "How often the LED bar is repainted while counting down.",
+          "led_color_hue": "LED bar hue while a timer is running (default 170, blue).",
+          "flash_threshold_seconds": "When the remaining time drops below this, the bar fast-blinks.",
+          "cmd_start": "ZHA event command that starts the timer (default up-paddle double tap).",
+          "cmd_up_hold": "ZHA event command that raises the time while held (default up-paddle hold).",
+          "cmd_up_release": "ZHA event command that locks the raised time (default up-paddle release).",
+          "cmd_down_hold": "ZHA event command that lowers the time while held (default down-paddle hold).",
+          "cmd_down_release": "ZHA event command that locks the lowered time (default down-paddle release)."
         }
       }
     }
@@ -100,6 +134,29 @@
       "description": "Arm pairing on a switch (same as holding its config button) so you can add others.",
       "fields": {
         "switch": {"name": "Switch", "description": "The switch to arm as the pairing anchor."}
+      }
+    },
+    "start_timer": {
+      "name": "Start timer",
+      "description": "Start (or restart) a switch's ventilation timer.",
+      "fields": {
+        "device_id": {"name": "Switch", "description": "The Inovelli switch running the timer."},
+        "minutes": {"name": "Minutes", "description": "Minutes to run (default: the double-tap start value)."}
+      }
+    },
+    "cancel_timer": {
+      "name": "Cancel timer",
+      "description": "Cancel a running ventilation timer and turn the load off.",
+      "fields": {
+        "device_id": {"name": "Switch", "description": "The Inovelli switch running the timer."}
+      }
+    },
+    "set_minutes": {
+      "name": "Set minutes",
+      "description": "Set the remaining minutes on a switch's ventilation timer (0 cancels).",
+      "fields": {
+        "device_id": {"name": "Switch", "description": "The Inovelli switch running the timer."},
+        "minutes": {"name": "Minutes", "description": "New remaining minutes (0 cancels)."}
       }
     }
   }

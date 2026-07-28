@@ -19,13 +19,16 @@ import voluptuous as vol
 from .const import (
     DOMAIN,
     SERVICE_ADD_MEMBER,
+    SERVICE_CANCEL_TIMER,
     SERVICE_CREATE_GROUP,
     SERVICE_DELETE_GROUP,
     SERVICE_ENTER_PAIRING,
     SERVICE_REMOVE_MEMBER,
     SERVICE_SET_COLOR,
+    SERVICE_SET_MINUTES,
+    SERVICE_START_TIMER,
 )
-from .runtime import get_engine
+from .runtime import get_engine, get_engine_for_device
 
 _HUE = vol.All(vol.Coerce(int), vol.Range(min=0, max=255))
 _GID = vol.All(vol.Coerce(int), vol.Range(min=1))
@@ -42,6 +45,23 @@ _REMOVE_SCHEMA = _ADD_SCHEMA
 _COLOR_SCHEMA = vol.Schema({vol.Required("group_id"): _GID, vol.Required("color_hue"): _HUE})
 _DELETE_SCHEMA = vol.Schema({vol.Required("group_id"): _GID})
 _PAIR_SCHEMA = vol.Schema({vol.Required("switch"): cv.string})
+
+# --- Timer service schemas ------------------------------------------------------
+_MINUTES = vol.All(vol.Coerce(float), vol.Range(min=0, max=1440))
+_START_TIMER_SCHEMA = vol.Schema(
+    {vol.Required("device_id"): cv.string, vol.Optional("minutes"): _MINUTES}
+)
+_CANCEL_TIMER_SCHEMA = vol.Schema({vol.Required("device_id"): cv.string})
+_SET_MINUTES_SCHEMA = vol.Schema(
+    {vol.Required("device_id"): cv.string, vol.Required("minutes"): _MINUTES}
+)
+
+
+def _timer_engine_or_raise(hass: HomeAssistant, device_id: str) -> Any:
+    engine = get_engine_for_device(hass, device_id)
+    if engine is None:
+        raise ServiceValidationError(f"No ventilation timer is configured for device {device_id}.")
+    return engine
 
 
 def _ieee_from_device(hass: HomeAssistant, device_id: str) -> str:
@@ -103,6 +123,19 @@ def async_register(hass: HomeAssistant) -> None:
         engine = _engine_or_raise(hass)
         await engine.async_enter_pairing_mode(_ieee_from_device(hass, call.data["switch"]))
 
+    async def _start_timer(call: ServiceCall) -> None:
+        await _timer_engine_or_raise(hass, call.data["device_id"]).async_start(
+            call.data.get("minutes")
+        )
+
+    async def _cancel_timer(call: ServiceCall) -> None:
+        await _timer_engine_or_raise(hass, call.data["device_id"]).async_cancel()
+
+    async def _set_minutes(call: ServiceCall) -> None:
+        await _timer_engine_or_raise(hass, call.data["device_id"]).async_set_minutes(
+            call.data["minutes"]
+        )
+
     hass.services.async_register(
         DOMAIN, SERVICE_CREATE_GROUP, _create, _CREATE_SCHEMA, SupportsResponse.OPTIONAL
     )
@@ -111,6 +144,9 @@ def async_register(hass: HomeAssistant) -> None:
     hass.services.async_register(DOMAIN, SERVICE_SET_COLOR, _color, _COLOR_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_DELETE_GROUP, _delete, _DELETE_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_ENTER_PAIRING, _pair, _PAIR_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_START_TIMER, _start_timer, _START_TIMER_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_CANCEL_TIMER, _cancel_timer, _CANCEL_TIMER_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_SET_MINUTES, _set_minutes, _SET_MINUTES_SCHEMA)
 
 
 @callback
@@ -122,5 +158,8 @@ def async_unregister(hass: HomeAssistant) -> None:
         SERVICE_SET_COLOR,
         SERVICE_DELETE_GROUP,
         SERVICE_ENTER_PAIRING,
+        SERVICE_START_TIMER,
+        SERVICE_CANCEL_TIMER,
+        SERVICE_SET_MINUTES,
     ):
         hass.services.async_remove(DOMAIN, service)

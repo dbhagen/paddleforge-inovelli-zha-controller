@@ -82,3 +82,44 @@ enter_pairing_mode:
         device:
           integration: zha
           manufacturer: Inovelli
+
+start_timer:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: zha
+          manufacturer: Inovelli
+    minutes:
+      example: 30
+      selector:
+        number:
+          min: 0
+          max: 1440
+          mode: box
+
+cancel_timer:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: zha
+          manufacturer: Inovelli
+
+set_minutes:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: zha
+          manufacturer: Inovelli
+    minutes:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 1440
+          mode: box

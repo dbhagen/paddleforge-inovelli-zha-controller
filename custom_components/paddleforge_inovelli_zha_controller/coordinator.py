@@ -11,6 +11,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN, SIGNAL_GROUPS_UPDATED
 from .engine import ScenePairingEngine
+from .timer_engine import FanTimerEngine
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,3 +41,20 @@ class ScenePairingCoordinator(DataUpdateCoordinator[list[dict[str, Any]]]):
         if (unsub := getattr(self, "_unsub_signal", None)) is not None:
             unsub()
             self._unsub_signal = None
+
+
+class FanTimerCoordinator(DataUpdateCoordinator[dict[str, Any]]):
+    """Push coordinator for a per-device timer: the engine calls ``async_push`` on
+    every state change (no polling, no dispatcher)."""
+
+    def __init__(self, hass: HomeAssistant, engine: FanTimerEngine) -> None:
+        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=None)
+        self.engine = engine
+
+    async def _async_update_data(self) -> dict[str, Any]:
+        return self.engine.snapshot()
+
+    @callback
+    def async_push(self) -> None:
+        """Wired to ``engine.on_update`` — publish the latest snapshot to entities."""
+        self.async_set_updated_data(self.engine.snapshot())
