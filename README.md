@@ -7,10 +7,17 @@
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=dbhagen&repository=paddleforge-inovelli-zha-controller&category=integration)
 
-> Pair Inovelli Blue switches into **bidirectionally-mirrored Zigbee groups** and set
-> **per-group LED bar colors** — entirely from the switch's scene button, over **ZHA**.
-> No hand-written automations, no hub round-trip: grouped switches mirror each other at
-> the Zigbee level.
+> Drive Inovelli Blue switches from their own gestures, over **ZHA** — no hand-written
+> automations, no hub round-trip. Two features share one integration:
+>
+> - **Grouping** — pair switches into **bidirectionally-mirrored Zigbee groups** with
+>   **per-group LED bar colors**, entirely from the **config button**. Grouped switches
+>   mirror each other at the Zigbee level, even if Home Assistant is offline.
+> - **Ventilation timers** — turn any switch into a **paddle-driven countdown timer**:
+>   double-tap to start, hold up/down to change the remaining time, watch the LED bar
+>   count down, load off at zero.
+>
+> The two use different buttons (config button vs paddles), so a switch can run both.
 
 ## Why
 
@@ -24,6 +31,7 @@ Assistant is offline.
 ## Supported devices
 
 - **Inovelli Blue 2-in-1 Dimmer — VZM31-SN**
+- **Inovelli Blue On/Off Switch — VZM30-SN** (great as a ventilation-timer host)
 - **Inovelli Blue Fan Switch — VZM35-SN**
 - Requires the **ZHA** (Zigbee Home Automation) integration. **Zigbee2MQTT is not supported.**
 
@@ -52,6 +60,28 @@ The pairing gesture doubles as a per-switch LED setup: **hold** a switch to arm 
 **single-tap** to cycle its LED bar color. If you never join it to a group, the color you
 land on **sticks** — so `hold → tap → walk away` sets any switch's standalone color.
 
+## Ventilation timers
+
+Add a **ventilation timer** to a single switch (**Add Integration → Paddleforge Inovelli ZHA
+Controller → Ventilation timer for one switch**, one entry per switch). The timer is driven by
+the **paddles**, so it coexists with grouping on the config button:
+
+| Gesture | Action |
+| --- | --- |
+| **Double-tap up** (paddle) | Start the timer (default: the maximum) — load on |
+| **Hold up** (paddle) | Raise the remaining time; the LED bar fills from the bottom |
+| **Hold down** (paddle) | Lower the remaining time |
+| (at zero) | Load off, LED clears |
+
+While running, the LED bar shows the time remaining and **fast-blinks** near expiry. Turning the
+load off manually cancels the timer. Each gesture is remappable, and everything is also available
+as services (`start_timer`, `cancel_timer`, `set_minutes`) plus `switch`/`number`/`sensor`
+entities on the device — so automations (e.g. a humidity trigger) can start a timed run and get
+the same LED countdown.
+
+Timer options: maximum minutes, double-tap start minutes, hold-ramp speed, LED refresh interval
+and color, near-expiry flash threshold, and the five paddle-gesture mappings.
+
 ## Dashboard
 
 Enable **Management dashboard** in the options to add an **Paddleforge Controller** sidebar panel
@@ -74,7 +104,9 @@ for use in your own automations.
 2. Add `https://github.com/dbhagen/paddleforge-inovelli-zha-controller`, category **Integration**
    (or click the **My Home Assistant** badge above).
 3. Install **Paddleforge Inovelli ZHA Controller**, then **restart Home Assistant**.
-4. **Settings → Devices & Services → Add Integration →** search "Paddleforge Inovelli ZHA Controller".
+4. **Settings → Devices & Services → Add Integration →** search "Paddleforge Inovelli ZHA
+   Controller". A menu offers the **grouping controller** (add once) and a **ventilation timer**
+   (add one per switch).
 
 ## Options
 
