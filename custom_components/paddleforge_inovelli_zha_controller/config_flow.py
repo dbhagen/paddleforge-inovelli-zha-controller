@@ -141,9 +141,7 @@ class PaddleforgeControllerConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        return self.async_show_menu(
-            step_id="user", menu_options=["controller", "device_timer"]
-        )
+        return self.async_show_menu(step_id="user", menu_options=["controller", "device_timer"])
 
     async def async_step_controller(
         self, user_input: dict[str, Any] | None = None
