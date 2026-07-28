@@ -26,7 +26,7 @@ class ScenePairingGroupsSensor(CoordinatorEntity[ScenePairingCoordinator], Senso
     """Reports how many pairing groups exist and their full detail as attributes."""
 
     _attr_has_entity_name = False
-    _attr_name = "Inovelli Scene Pairing Groups"
+    _attr_name = "Paddleforge Inovelli ZHA Controller Groups"
     _attr_icon = "mdi:led-strip-variant"
     _attr_state_class = SensorStateClass.MEASUREMENT
 

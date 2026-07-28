@@ -1,8 +1,8 @@
-"""Constants for the Inovelli Scene Pairing integration."""
+"""Constants for the Paddleforge Inovelli ZHA Controller integration."""
 
 from __future__ import annotations
 
-DOMAIN = "inovelli_scene_pairing"
+DOMAIN = "paddleforge_inovelli_zha_controller"
 
 # Home Assistant event fired by ZHA for device scene/button actions.
 ZHA_EVENT = "zha_event"
@@ -112,9 +112,9 @@ SERVICE_DELETE_GROUP = "delete_group"
 SERVICE_ENTER_PAIRING = "enter_pairing_mode"
 
 # Frontend panel/card
-PANEL_URL_PATH = "inovelli-pairing"
-PANEL_TITLE = "Inovelli Pairing"
+PANEL_URL_PATH = "paddleforge-controller"
+PANEL_TITLE = "Paddleforge Controller"
 PANEL_ICON = "mdi:led-strip-variant"
-PANEL_NAME = "inovelli-scene-pairing-panel"
-FRONTEND_SCRIPT_URL = f"/{DOMAIN}/inovelli-scene-pairing-panel.js"
+PANEL_NAME = "paddleforge-inovelli-zha-controller-panel"
+FRONTEND_SCRIPT_URL = f"/{DOMAIN}/paddleforge-inovelli-zha-controller-panel.js"
 WS_LIST_GROUPS = f"{DOMAIN}/list_groups"

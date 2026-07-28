@@ -2,18 +2,18 @@
   "config": {
     "step": {
       "user": {
-        "title": "Inovelli Scene Pairing",
+        "title": "Paddleforge Inovelli ZHA Controller",
         "description": "Pair Inovelli Blue switches into ZHA groups from their scene buttons. Requires the ZHA integration."
       }
     },
     "abort": {
-      "single_instance_allowed": "Only a single configuration of Inovelli Scene Pairing is allowed."
+      "single_instance_allowed": "Only a single configuration of Paddleforge Inovelli ZHA Controller is allowed."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Inovelli Scene Pairing options",
+        "title": "Paddleforge Inovelli ZHA Controller options",
         "data": {
           "window_seconds": "Pairing window (seconds)",
           "palette": "LED color palette (comma-separated hues 0-255)",
@@ -39,7 +39,7 @@
           "default_light_hue": "LED bar hue a light dimmer shows when it is not in a group (default 21, orange).",
           "default_fan_hue": "LED bar hue a fan switch shows when it is not in a group (default 170, blue).",
           "enable_hardware": "React to the physical scene buttons (hold to pair/arm, tap to set color, etc.). Turn off for a dashboard-only setup.",
-          "enable_dashboard": "Adds an \"Inovelli Pairing\" sidebar panel + Lovelace card to create, add, recolor, and remove groups. Hard-refresh the browser after toggling.",
+          "enable_dashboard": "Adds an \"Paddleforge Controller\" sidebar panel + Lovelace card to create, add, recolor, and remove groups. Hard-refresh the browser after toggling.",
           "hide_group_entities": "ZHA auto-creates a light + switch entity for every Zigbee group; they duplicate the bound switches and leak to HomeKit/Google. On (default) disables them in the entity registry; off re-enables the ones this integration disabled."
         }
       }

@@ -1,4 +1,4 @@
-"""Inovelli Scene Pairing — pair Inovelli Blue switches into ZHA groups by gesture."""
+"""Paddleforge Inovelli ZHA Controller — pair Inovelli Blue switches into ZHA groups by gesture."""
 
 from __future__ import annotations
 

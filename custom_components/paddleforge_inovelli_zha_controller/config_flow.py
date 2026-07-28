@@ -1,4 +1,4 @@
-"""Config and options flow for Inovelli Scene Pairing."""
+"""Config and options flow for Paddleforge Inovelli ZHA Controller."""
 
 from __future__ import annotations
 
@@ -97,7 +97,7 @@ class InovelliScenePairingConfigFlow(ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(DOMAIN)
         self._abort_if_unique_id_configured()
         if user_input is not None:
-            return self.async_create_entry(title="Inovelli Scene Pairing", data={})
+            return self.async_create_entry(title="Paddleforge Inovelli ZHA Controller", data={})
         return self.async_show_form(step_id="user")
 
     @staticmethod

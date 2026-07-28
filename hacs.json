@@ -1,5 +1,5 @@
 {
-  "name": "Inovelli Scene Pairing",
+  "name": "Paddleforge Inovelli ZHA Controller",
   "content_in_root": false,
   "render_readme": true,
   "homeassistant": "2024.8.0",

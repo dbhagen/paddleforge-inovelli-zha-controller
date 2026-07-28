@@ -57,7 +57,7 @@ def _ieee_from_device(hass: HomeAssistant, device_id: str) -> str:
 def _engine_or_raise(hass: HomeAssistant) -> Any:
     engine = get_engine(hass)
     if engine is None:
-        raise HomeAssistantError("Inovelli Scene Pairing is not loaded.")
+        raise HomeAssistantError("Paddleforge Inovelli ZHA Controller is not loaded.")
     return engine
 
 

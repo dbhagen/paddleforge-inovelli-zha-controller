@@ -1,0 +1,20 @@
+{
+  "domain": "paddleforge_inovelli_zha_controller",
+  "name": "Paddleforge Inovelli ZHA Controller",
+  "codeowners": [
+    "@dbhagen"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "frontend",
+    "http",
+    "websocket_api",
+    "zha"
+  ],
+  "documentation": "https://github.com/dbhagen/paddleforge-inovelli-zha-controller",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/dbhagen/paddleforge-inovelli-zha-controller/issues",
+  "requirements": [],
+  "version": "0.3.0"
+}

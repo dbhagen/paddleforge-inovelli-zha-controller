@@ -7,4 +7,4 @@ select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
-known-first-party = ["custom_components.inovelli_scene_pairing"]
+known-first-party = ["custom_components.paddleforge_inovelli_zha_controller"]
