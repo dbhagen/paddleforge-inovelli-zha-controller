@@ -161,12 +161,16 @@ MODE_EXPIRING = "expiring"
 
 # --- Timer gesture commands (paddle) --------------------------------------------
 CONF_CMD_START = "cmd_start"
+CONF_CMD_ON = "cmd_on"  # turn the load on WITHOUT a timer ("stay on")
 CONF_CMD_UP_HOLD = "cmd_up_hold"
 CONF_CMD_UP_RELEASE = "cmd_up_release"
 CONF_CMD_DOWN_HOLD = "cmd_down_hold"
 CONF_CMD_DOWN_RELEASE = "cmd_down_release"
 
 DEFAULT_CMD_START = "button_2_double"
+DEFAULT_CMD_ON = (
+    ""  # unmapped by default (opt-in per device, e.g. single tap = timer + double = stay on)
+)
 DEFAULT_CMD_UP_HOLD = "button_2_hold"
 DEFAULT_CMD_UP_RELEASE = "button_2_release"
 DEFAULT_CMD_DOWN_HOLD = "button_1_hold"
@@ -213,6 +217,7 @@ DEFAULT_TIMER_OPTIONS = {
     CONF_PULSE_HUE: DEFAULT_PULSE_HUE,
     CONF_FLASH_THRESHOLD_SECONDS: DEFAULT_FLASH_THRESHOLD_SECONDS,
     CONF_CMD_START: DEFAULT_CMD_START,
+    CONF_CMD_ON: DEFAULT_CMD_ON,
     CONF_CMD_UP_HOLD: DEFAULT_CMD_UP_HOLD,
     CONF_CMD_UP_RELEASE: DEFAULT_CMD_UP_RELEASE,
     CONF_CMD_DOWN_HOLD: DEFAULT_CMD_DOWN_HOLD,

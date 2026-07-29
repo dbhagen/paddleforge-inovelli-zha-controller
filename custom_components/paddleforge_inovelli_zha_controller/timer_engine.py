@@ -33,6 +33,7 @@ from .const import (
     CONF_AUTO_LED_COLOR_HUE,
     CONF_CMD_DOWN_HOLD,
     CONF_CMD_DOWN_RELEASE,
+    CONF_CMD_ON,
     CONF_CMD_START,
     CONF_CMD_UP_HOLD,
     CONF_CMD_UP_RELEASE,
@@ -46,6 +47,7 @@ from .const import (
     DEFAULT_AUTO_LED_COLOR_HUE,
     DEFAULT_CMD_DOWN_HOLD,
     DEFAULT_CMD_DOWN_RELEASE,
+    DEFAULT_CMD_ON,
     DEFAULT_CMD_START,
     DEFAULT_CMD_UP_HOLD,
     DEFAULT_CMD_UP_RELEASE,
@@ -125,6 +127,7 @@ class FanTimerEngine:
         mapping: dict[str, str] = {}
         for key, action, default in (
             (CONF_CMD_START, "start", DEFAULT_CMD_START),
+            (CONF_CMD_ON, "manual_on", DEFAULT_CMD_ON),
             (CONF_CMD_UP_HOLD, "up_hold", DEFAULT_CMD_UP_HOLD),
             (CONF_CMD_UP_RELEASE, "release", DEFAULT_CMD_UP_RELEASE),
             (CONF_CMD_DOWN_HOLD, "down_hold", DEFAULT_CMD_DOWN_HOLD),
@@ -247,6 +250,8 @@ class FanTimerEngine:
                 if action == "start":
                     self._state.auto = False  # a paddle start is manual
                     await self._start(self._double_tap_minutes)
+                elif action == "manual_on":
+                    await self._manual_on()
                 elif action == "up_hold":
                     await self._begin_ramp(1)
                 elif action == "down_hold":
@@ -270,6 +275,13 @@ class FanTimerEngine:
         await self._load_on()
         await self._paint()
         self._arm_deadline()
+
+    async def _manual_on(self) -> None:
+        """Turn the load on with no timer ("stay on"). Cancel any running timer first so
+        its LED clears and the idle bar is restored; then turn the load on directly (not
+        via _load_on, which would suppress the idle indicator)."""
+        await self._cancel(turn_off=False)
+        await self._call_load("turn_on")
 
     async def _begin_ramp(self, direction: int) -> None:
         base = self._remaining_minutes() if self._state.mode in _ACTIVE else 0.0
@@ -447,7 +459,11 @@ class FanTimerEngine:
             self._last_segments[i] = target
 
     async def _clear_led(self) -> None:
-        # One all-bar clear wipes every segment; reset the diff cache.
+        # Clear each segment individually so a per-segment pulse (the breathing edge) is
+        # stopped — an all-bar clear alone leaves it running — then an all-bar clear as a
+        # backstop; reset the diff cache.
+        for i in range(LED_SEGMENTS):
+            await self._issue_led_effect(LED_FX_CLEAR, 0, 0, duration=0, led_number=i)
         await self._issue_led_effect(LED_FX_CLEAR, 0, 0, duration=0)
         self._last_segments = [None] * LED_SEGMENTS
 
@@ -522,6 +538,9 @@ class FanTimerEngine:
         return chosen
 
     async def _load_on(self) -> None:
+        # Kill the idle load-level indicator BEFORE energizing, so the switch's idle
+        # color (e.g. orange) doesn't flash on the bar before the fill is painted.
+        await self._ensure_indicator_off()
         await self._call_load("turn_on")
 
     async def _load_off(self) -> None:
