@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/compare/v0.4.0...v0.5.0) (2026-07-29)
+
+
+### Features
+
+* **timer:** stay-on gesture, no-flash start, clear breathing on cancel ([#9](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/issues/9)) ([e632eea](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/commit/e632eeae7d8ee7b9bfb619c9f64bf6009268cce2))
+
 ## [0.4.0](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/compare/v0.3.0...v0.4.0) (2026-07-29)
 
 
