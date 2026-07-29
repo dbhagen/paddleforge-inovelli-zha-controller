@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.4.0](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/compare/v0.3.0...v0.4.0) (2026-07-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* config domain renamed; existing entries must be deleted and re-added.
+
+### Features
+
+* consolidate scene-pairing + fan-timer into Paddleforge Inovelli ZHA Controller ([#6](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/issues/6)) ([0abe81d](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/commit/0abe81d5d564ad6ff1b0e4d5549cbe3ff8e0fdd9))
+
+
+### Bug Fixes
+
+* **timer:** load resolution + breathing configurable LED (hardware-validated) ([#8](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/issues/8)) ([a89d8e3](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/commit/a89d8e3edeb8d818edd140e258d41e987c4a1c85))
+
 ## [0.3.0](https://github.com/dbhagen/paddleforge-inovelli-zha-controller/compare/v0.2.0...v0.3.0) (2026-07-17)
 
 
