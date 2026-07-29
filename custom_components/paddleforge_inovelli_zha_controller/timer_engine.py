@@ -30,6 +30,7 @@ from homeassistant.helpers.event import (
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CONF_AUTO_LED_COLOR_HUE,
     CONF_CMD_DOWN_HOLD,
     CONF_CMD_DOWN_RELEASE,
     CONF_CMD_START,
@@ -42,6 +43,7 @@ from .const import (
     CONF_LED_REFRESH_INTERVAL,
     CONF_MAX_MINUTES,
     CONF_PULSE_HUE,
+    DEFAULT_AUTO_LED_COLOR_HUE,
     DEFAULT_CMD_DOWN_HOLD,
     DEFAULT_CMD_DOWN_RELEASE,
     DEFAULT_CMD_START,
@@ -88,6 +90,7 @@ class _State:
     suppress_load_until: float = 0.0
     last_command: str = ""
     last_command_ts: float = 0.0
+    auto: bool = False  # humidity/automation-started (paints the fill a distinct color)
 
 
 @dataclass
@@ -165,6 +168,13 @@ class FanTimerEngine:
         return int(self.options.get(CONF_PULSE_HUE, DEFAULT_PULSE_HUE))
 
     @property
+    def _fill_hue(self) -> int:
+        """Solid-fill color: the auto/humidity color when auto-started, else the manual color."""
+        if self._state.auto:
+            return int(self.options.get(CONF_AUTO_LED_COLOR_HUE, DEFAULT_AUTO_LED_COLOR_HUE))
+        return self._led_hue
+
+    @property
     def _flash_threshold(self) -> float:
         return float(
             self.options.get(CONF_FLASH_THRESHOLD_SECONDS, DEFAULT_FLASH_THRESHOLD_SECONDS)
@@ -235,6 +245,7 @@ class FanTimerEngine:
             self._state.last_command_ts = now
             try:
                 if action == "start":
+                    self._state.auto = False  # a paddle start is manual
                     await self._start(self._double_tap_minutes)
                 elif action == "up_hold":
                     await self._begin_ramp(1)
@@ -379,8 +390,9 @@ class FanTimerEngine:
         self._notify()
 
     # -- public API (services + entities) --------------------------------------
-    async def async_start(self, minutes: float | None = None) -> None:
+    async def async_start(self, minutes: float | None = None, auto: bool = False) -> None:
         async with self._lock:
+            self._state.auto = auto
             await self._start(self._double_tap_minutes if minutes is None else minutes)
         self._notify()
 
@@ -417,16 +429,17 @@ class FanTimerEngine:
         await self._ensure_indicator_off()
         segments = max(0, min(LED_SEGMENTS, round(self._fill_pct() / 100.0 * LED_SEGMENTS)))
         expiring = self._state.mode == MODE_EXPIRING
+        fill_hue = self._fill_hue
         for i in range(LED_SEGMENTS):
             if i >= segments:
                 target = (LED_FX_CLEAR, 0)
             elif expiring:
-                target = (LED_FX_FAST_BLINK, self._led_hue)
+                target = (LED_FX_FAST_BLINK, fill_hue)
             elif i == segments - 1:
                 # the active fill edge breathes to mark the counting segment (default white)
                 target = (LED_FX_PULSE, self._pulse_hue)
             else:
-                target = (LED_FX_SOLID, self._led_hue)
+                target = (LED_FX_SOLID, fill_hue)
             if self._last_segments[i] == target:
                 continue
             fx, color = target

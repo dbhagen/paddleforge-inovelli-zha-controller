@@ -98,6 +98,11 @@ start_timer:
           min: 0
           max: 1440
           mode: box
+    auto:
+      example: true
+      default: false
+      selector:
+        boolean:
 
 cancel_timer:
   fields:

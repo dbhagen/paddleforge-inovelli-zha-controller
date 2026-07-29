@@ -32,6 +32,7 @@ from homeassistant.helpers.selector import (
 import voluptuous as vol
 
 from .const import (
+    CONF_AUTO_LED_COLOR_HUE,
     CONF_CMD_ARM,
     CONF_CMD_COLOR,
     CONF_CMD_DOWN_HOLD,
@@ -58,6 +59,7 @@ from .const import (
     CONF_PALETTE,
     CONF_PULSE_HUE,
     CONF_WINDOW_SECONDS,
+    DEFAULT_AUTO_LED_COLOR_HUE,
     DEFAULT_CMD_ARM,
     DEFAULT_CMD_COLOR,
     DEFAULT_CMD_DOWN_HOLD,
@@ -291,6 +293,10 @@ class TimerOptionsFlow(OptionsFlow):
                 vol.Required(
                     CONF_LED_COLOR_HUE,
                     default=current.get(CONF_LED_COLOR_HUE, DEFAULT_LED_COLOR_HUE),
+                ): _hue_selector(),
+                vol.Required(
+                    CONF_AUTO_LED_COLOR_HUE,
+                    default=current.get(CONF_AUTO_LED_COLOR_HUE, DEFAULT_AUTO_LED_COLOR_HUE),
                 ): _hue_selector(),
                 vol.Required(
                     CONF_PULSE_HUE,

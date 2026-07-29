@@ -43,7 +43,8 @@
           "double_tap_minutes": "Double-tap start minutes",
           "hold_ramp_seconds_full": "Hold-ramp seconds (empty to full)",
           "led_refresh_interval": "LED refresh interval (seconds)",
-          "led_color_hue": "Timer fill color (hue 0-255)",
+          "led_color_hue": "Manual timer fill color (hue 0-255)",
+          "auto_led_color_hue": "Auto/humidity fill color (hue 0-255)",
           "pulse_hue": "Active-edge breathe color (hue 0-255, 255 = white)",
           "flash_threshold_seconds": "Near-expiry flash threshold (seconds)",
           "cmd_start": "Start-timer gesture",
@@ -69,7 +70,8 @@
           "double_tap_minutes": "Time a double-tap start loads (defaults to the maximum).",
           "hold_ramp_seconds_full": "Seconds of paddle-hold to sweep from empty to the maximum.",
           "led_refresh_interval": "How often the LED bar is repainted while counting down.",
-          "led_color_hue": "Color of the solid fill segments while a timer runs (default 170, blue).",
+          "led_color_hue": "Fill color for a manually-started (paddle) timer (default 170, blue).",
+          "auto_led_color_hue": "Fill color for a humidity/automation-started run, so you can tell it apart at a glance (default 127, teal).",
           "pulse_hue": "Color of the breathing segment at the top of the fill, marking the counting edge (default 255, white).",
           "flash_threshold_seconds": "When the remaining time drops below this, the bar fast-blinks.",
           "cmd_start": "ZHA event command that starts the timer (default up-paddle double tap).",
@@ -143,7 +145,8 @@
       "description": "Start (or restart) a switch's ventilation timer.",
       "fields": {
         "device_id": {"name": "Switch", "description": "The Inovelli switch running the timer."},
-        "minutes": {"name": "Minutes", "description": "Minutes to run (default: the double-tap start value)."}
+        "minutes": {"name": "Minutes", "description": "Minutes to run (default: the double-tap start value)."},
+        "auto": {"name": "Auto run", "description": "Mark this as a humidity/automation run so the LED fill uses the auto color (default off)."}
       }
     },
     "cancel_timer": {
