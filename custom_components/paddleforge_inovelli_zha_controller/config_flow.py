@@ -38,6 +38,7 @@ from .const import (
     CONF_CMD_DOWN_HOLD,
     CONF_CMD_DOWN_RELEASE,
     CONF_CMD_EXIT,
+    CONF_CMD_ON,
     CONF_CMD_REMOVE,
     CONF_CMD_START,
     CONF_CMD_UP_HOLD,
@@ -65,6 +66,7 @@ from .const import (
     DEFAULT_CMD_DOWN_HOLD,
     DEFAULT_CMD_DOWN_RELEASE,
     DEFAULT_CMD_EXIT,
+    DEFAULT_CMD_ON,
     DEFAULT_CMD_REMOVE,
     DEFAULT_CMD_START,
     DEFAULT_CMD_UP_HOLD,
@@ -310,6 +312,9 @@ class TimerOptionsFlow(OptionsFlow):
                 ): _box(0, 600, 5),
                 vol.Required(
                     CONF_CMD_START, default=current.get(CONF_CMD_START, DEFAULT_CMD_START)
+                ): _gesture_selector(),
+                vol.Optional(
+                    CONF_CMD_ON, default=current.get(CONF_CMD_ON, DEFAULT_CMD_ON)
                 ): _gesture_selector(),
                 vol.Required(
                     CONF_CMD_UP_HOLD, default=current.get(CONF_CMD_UP_HOLD, DEFAULT_CMD_UP_HOLD)
