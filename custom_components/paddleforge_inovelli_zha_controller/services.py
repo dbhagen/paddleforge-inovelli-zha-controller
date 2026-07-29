@@ -49,7 +49,11 @@ _PAIR_SCHEMA = vol.Schema({vol.Required("switch"): cv.string})
 # --- Timer service schemas ------------------------------------------------------
 _MINUTES = vol.All(vol.Coerce(float), vol.Range(min=0, max=1440))
 _START_TIMER_SCHEMA = vol.Schema(
-    {vol.Required("device_id"): cv.string, vol.Optional("minutes"): _MINUTES}
+    {
+        vol.Required("device_id"): cv.string,
+        vol.Optional("minutes"): _MINUTES,
+        vol.Optional("auto", default=False): cv.boolean,
+    }
 )
 _CANCEL_TIMER_SCHEMA = vol.Schema({vol.Required("device_id"): cv.string})
 _SET_MINUTES_SCHEMA = vol.Schema(
@@ -125,7 +129,7 @@ def async_register(hass: HomeAssistant) -> None:
 
     async def _start_timer(call: ServiceCall) -> None:
         await _timer_engine_or_raise(hass, call.data["device_id"]).async_start(
-            call.data.get("minutes")
+            call.data.get("minutes"), auto=call.data.get("auto", False)
         )
 
     async def _cancel_timer(call: ServiceCall) -> None:

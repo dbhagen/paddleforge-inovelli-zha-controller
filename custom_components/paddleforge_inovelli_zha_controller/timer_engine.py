@@ -30,6 +30,7 @@ from homeassistant.helpers.event import (
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CONF_AUTO_LED_COLOR_HUE,
     CONF_CMD_DOWN_HOLD,
     CONF_CMD_DOWN_RELEASE,
     CONF_CMD_START,
@@ -41,6 +42,8 @@ from .const import (
     CONF_LED_COLOR_HUE,
     CONF_LED_REFRESH_INTERVAL,
     CONF_MAX_MINUTES,
+    CONF_PULSE_HUE,
+    DEFAULT_AUTO_LED_COLOR_HUE,
     DEFAULT_CMD_DOWN_HOLD,
     DEFAULT_CMD_DOWN_RELEASE,
     DEFAULT_CMD_START,
@@ -51,6 +54,7 @@ from .const import (
     DEFAULT_LED_COLOR_HUE,
     DEFAULT_LED_REFRESH_INTERVAL,
     DEFAULT_MAX_MINUTES,
+    DEFAULT_PULSE_HUE,
     GESTURE_DEBOUNCE_SECONDS,
     INOVELLI_MFG_CLUSTER,
     INOVELLI_MFG_ID,
@@ -59,6 +63,7 @@ from .const import (
     LED_EFFECT_INDIVIDUAL_CMD,
     LED_FX_CLEAR,
     LED_FX_FAST_BLINK,
+    LED_FX_PULSE,
     LED_FX_SOLID,
     LED_SEGMENTS,
     LOAD_SUPPRESS_SECONDS,
@@ -85,6 +90,7 @@ class _State:
     suppress_load_until: float = 0.0
     last_command: str = ""
     last_command_ts: float = 0.0
+    auto: bool = False  # humidity/automation-started (paints the fill a distinct color)
 
 
 @dataclass
@@ -157,6 +163,18 @@ class FanTimerEngine:
         return int(self.options.get(CONF_LED_COLOR_HUE, DEFAULT_LED_COLOR_HUE))
 
     @property
+    def _pulse_hue(self) -> int:
+        """Color of the breathing active-edge segment (255 = white)."""
+        return int(self.options.get(CONF_PULSE_HUE, DEFAULT_PULSE_HUE))
+
+    @property
+    def _fill_hue(self) -> int:
+        """Solid-fill color: the auto/humidity color when auto-started, else the manual color."""
+        if self._state.auto:
+            return int(self.options.get(CONF_AUTO_LED_COLOR_HUE, DEFAULT_AUTO_LED_COLOR_HUE))
+        return self._led_hue
+
+    @property
     def _flash_threshold(self) -> float:
         return float(
             self.options.get(CONF_FLASH_THRESHOLD_SECONDS, DEFAULT_FLASH_THRESHOLD_SECONDS)
@@ -227,6 +245,7 @@ class FanTimerEngine:
             self._state.last_command_ts = now
             try:
                 if action == "start":
+                    self._state.auto = False  # a paddle start is manual
                     await self._start(self._double_tap_minutes)
                 elif action == "up_hold":
                     await self._begin_ramp(1)
@@ -371,8 +390,9 @@ class FanTimerEngine:
         self._notify()
 
     # -- public API (services + entities) --------------------------------------
-    async def async_start(self, minutes: float | None = None) -> None:
+    async def async_start(self, minutes: float | None = None, auto: bool = False) -> None:
         async with self._lock:
+            self._state.auto = auto
             await self._start(self._double_tap_minutes if minutes is None else minutes)
         self._notify()
 
@@ -408,9 +428,18 @@ class FanTimerEngine:
         """
         await self._ensure_indicator_off()
         segments = max(0, min(LED_SEGMENTS, round(self._fill_pct() / 100.0 * LED_SEGMENTS)))
-        effect = LED_FX_FAST_BLINK if self._state.mode == MODE_EXPIRING else LED_FX_SOLID
+        expiring = self._state.mode == MODE_EXPIRING
+        fill_hue = self._fill_hue
         for i in range(LED_SEGMENTS):
-            target = (effect, self._led_hue) if i < segments else (LED_FX_CLEAR, 0)
+            if i >= segments:
+                target = (LED_FX_CLEAR, 0)
+            elif expiring:
+                target = (LED_FX_FAST_BLINK, fill_hue)
+            elif i == segments - 1:
+                # the active fill edge breathes to mark the counting segment (default white)
+                target = (LED_FX_PULSE, self._pulse_hue)
+            else:
+                target = (LED_FX_SOLID, fill_hue)
             if self._last_segments[i] == target:
                 continue
             fx, color = target
@@ -478,7 +507,11 @@ class FanTimerEngine:
             for ent in er.async_entries_for_device(
                 ent_reg, device.id, include_disabled_entities=False
             )
-            if ent.entity_category is None and ent.entity_id.split(".")[0] in ("switch", "light")
+            if ent.entity_category is None
+            # ONLY the ZHA-native load — never our own timer switch/number/sensor, which
+            # also attach to this device and would otherwise be picked as "the load".
+            and ent.platform == "zha"
+            and ent.entity_id.split(".")[0] in ("switch", "light")
         ]
         # Prefer a load switch (on/off model) over the dimmer light (test device).
         mains.sort(key=lambda e: 0 if e.entity_id.startswith("switch.") else 1)

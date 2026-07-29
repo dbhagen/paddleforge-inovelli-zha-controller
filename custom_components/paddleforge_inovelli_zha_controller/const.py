@@ -150,6 +150,8 @@ LED_FX_PULSE = 4  # breathing — reserved for the (later) humidity auto-mode
 LED_DURATION_INDEFINITE = 255
 
 LED_HUE_TIMER_DEFAULT = 170  # blue (the house "fan" color)
+LED_HUE_AUTO_DEFAULT = 127  # teal/cyan — distinguishes a humidity/auto run from a manual one
+LED_HUE_WHITE = 255  # Inovelli LED color 255 = white (a special value above the 0-254 hue range)
 
 # --- Timer modes ----------------------------------------------------------------
 MODE_IDLE = "idle"
@@ -179,12 +181,16 @@ CONF_DOUBLE_TAP_MINUTES = "double_tap_minutes"
 CONF_HOLD_RAMP_SECONDS = "hold_ramp_seconds_full"
 CONF_LED_REFRESH_INTERVAL = "led_refresh_interval"
 CONF_LED_COLOR_HUE = "led_color_hue"
+CONF_AUTO_LED_COLOR_HUE = "auto_led_color_hue"
+CONF_PULSE_HUE = "pulse_hue"
 CONF_FLASH_THRESHOLD_SECONDS = "flash_threshold_seconds"
 
 DEFAULT_MAX_MINUTES = 30
 DEFAULT_HOLD_RAMP_SECONDS = 6
 DEFAULT_LED_REFRESH_INTERVAL = 10
 DEFAULT_LED_COLOR_HUE = LED_HUE_TIMER_DEFAULT
+DEFAULT_AUTO_LED_COLOR_HUE = LED_HUE_AUTO_DEFAULT  # fill color for humidity/auto runs (teal)
+DEFAULT_PULSE_HUE = LED_HUE_WHITE  # the breathing active-edge segment (255 = white)
 DEFAULT_FLASH_THRESHOLD_SECONDS = 60
 
 # Hidden tuning constants (not exposed as options).
@@ -203,6 +209,8 @@ DEFAULT_TIMER_OPTIONS = {
     CONF_HOLD_RAMP_SECONDS: DEFAULT_HOLD_RAMP_SECONDS,
     CONF_LED_REFRESH_INTERVAL: DEFAULT_LED_REFRESH_INTERVAL,
     CONF_LED_COLOR_HUE: DEFAULT_LED_COLOR_HUE,
+    CONF_AUTO_LED_COLOR_HUE: DEFAULT_AUTO_LED_COLOR_HUE,
+    CONF_PULSE_HUE: DEFAULT_PULSE_HUE,
     CONF_FLASH_THRESHOLD_SECONDS: DEFAULT_FLASH_THRESHOLD_SECONDS,
     CONF_CMD_START: DEFAULT_CMD_START,
     CONF_CMD_UP_HOLD: DEFAULT_CMD_UP_HOLD,
